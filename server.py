@@ -7,7 +7,7 @@ import bottle
 from bottle import route, run, template
 
 @route('/hello')
-def index(name):
+def index():
     return "Hello there, kenobi"
 
 application = bottle.default_app()
