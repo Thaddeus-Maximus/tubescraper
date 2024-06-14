@@ -1,7 +1,5 @@
-$def with(creators, msg)
-
 <script>
-    creator_names = $:creators;
+    creator_names = {{! creators}};
 
     function init() {
             let select = document.getElementById('creator');
@@ -33,7 +31,7 @@ $def with(creators, msg)
 
 <body onload="init()">
 
-<h2>$msg</h2>
+<h2>{{msg}}</h2>
 
 <h1>Download YouTube Video as Podcast</h1>
 <form method="POST">
