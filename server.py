@@ -1,7 +1,13 @@
+
+import sys
+
+sys.path.insert(0, "/Library/WebServer/Documents/hello_app")
+
+import bottle
 from bottle import route, run, template
 
-@route('/<name>')
+@route('/hello')
 def index(name):
-    return template('<b>Hello {{name}}</b>!', name=name)
+    return "Hello there, kenobi"
 
-run(host='localhost', port=8080)
+application = bottle.default_app()
