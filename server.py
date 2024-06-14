@@ -22,7 +22,7 @@ def index():
 def index_GET():
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
     #creators = ["Jonathan Pageau", "Jordan Peterson", "Alex Jones"]
-    return template('index.tpl', creators=json.dumps(creators), msg="...")
+    return template('/var/www/tubescraber/index.tpl', creators=json.dumps(creators), msg="...")
 
 @post('/')
 def index_POST():
@@ -56,7 +56,7 @@ def index_POST():
 
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
 
-    return template('index.tpl', creators=json.dumps(creators), msg="DOWNLOADING!")
+    return template('/var/www/tubescraber/index.tpl', creators=json.dumps(creators), msg="DOWNLOADING!")
 
 
 
