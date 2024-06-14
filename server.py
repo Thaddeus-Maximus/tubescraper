@@ -8,6 +8,7 @@ import downloader
 import re
 import bottle
 from bottle import route, request, post, run, template
+bottle.TEMPLATE_PATH.insert(0, "/var/www/tubescraper/")
 
 
 library_location = '/home/navidromeuser/library/'
@@ -22,7 +23,7 @@ def index():
 def index_GET():
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
     #creators = ["Jonathan Pageau", "Jordan Peterson", "Alex Jones"]
-    return template('/var/www/tubescraber/index.tpl', creators=json.dumps(creators), msg="...")
+    return template('index.tpl', creators=json.dumps(creators), msg="...")
 
 @post('/')
 def index_POST():
@@ -56,7 +57,7 @@ def index_POST():
 
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
 
-    return template('/var/www/tubescraber/index.tpl', creators=json.dumps(creators), msg="DOWNLOADING!")
+    return template('index.tpl', creators=json.dumps(creators), msg="DOWNLOADING!")
 
 
 
