@@ -11,7 +11,7 @@ from bottle import route, request, post, run, template
 bottle.TEMPLATE_PATH.insert(0, "/var/www/tubescraper/")
 
 
-library_location = '/home/navidromeuser/library/'
+library_location = '/home/navidromeuser/library/pods/'
 
 pool = multiprocessing.Pool(8)
 
