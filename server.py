@@ -1,6 +1,7 @@
+from config import *
 
 import sys
-sys.path.insert(0, "/var/www/tubescraper/")
+sys.path.insert(0, server_location)
 import json
 import os
 import multiprocessing
@@ -9,10 +10,7 @@ import re
 import bottle
 bottle.debug(True)
 from bottle import route, request, post, run, template, response
-bottle.TEMPLATE_PATH.insert(0, "/var/www/tubescraper/")
-
-
-library_location = '/home/navidromeuser/library/pods/'
+bottle.TEMPLATE_PATH.insert(0, server_location)
 
 pool = multiprocessing.Pool(8)
 
