@@ -7,11 +7,12 @@ import multiprocessing
 import downloader
 import re
 import bottle
-from bottle import route, request, post, run, template
+bottle.debug(True)
+from bottle import route, request, post, run, template, response
 bottle.TEMPLATE_PATH.insert(0, "/var/www/tubescraper/")
 
 
-library_location = '/home/navidromeuser/library/pods/'
+library_location = './library' # '/home/navidromeuser/library/pods/'
 
 pool = multiprocessing.Pool(8)
 
@@ -21,19 +22,30 @@ def index():
 
 @route('/', method='GET')
 def index_GET():
-    creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
+    #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
     #creators = ["Jonathan Pageau", "Jordan Peterson", "Alex Jones"]
-    return template('index.tpl', creators=json.dumps(creators), msg="...")
+    #return template('index.tpl', creators=json.dumps(creators), msg="...")
 
-@post('/')
-def index_POST():
+    creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
+
+    if 'url' in request.query:
+        url = request.query['url']
+        return template('index.tpl', creators=creators, url=url)
+    return template('index.tpl', creators=creators, url='')
+
+@post('/scrape')
+def scrape():
+    if 'url' in request.forms:
+        url = request.forms['url']
+        scraped = downloader.scrape(url)
+        return json.dumps(scraped)
+    return json.dumps({'error': 'no url provided'})
+
+@post('/download_video')
+def download_video():
     data = request.forms
-    print(data.get('creator'))
-    print(data.get('url'))
-    print(data.get('creator_new'))
 
-    creator = data.get('creator') if data.get('creator') else data.get('creator_new')
-    if not creator:
+    if not data.get('channel'):
         return 'You need to specify a creator'
     if not data.get('url'):
         return 'You need to specify a URL'
@@ -47,9 +59,9 @@ def index_POST():
     vid = match[1]
 
     pkg = {
-       "artist": creator,
+       "artist": data.get('channel'),
        "title":  data.get('title'),
-       "root":  os.path.join(library_location, creator),
+       "root":  os.path.join(library_location, data.get('channel')),
        "vid": vid
     }
 
@@ -57,7 +69,7 @@ def index_POST():
 
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
 
-    return template('index.tpl', creators=json.dumps(creators), msg="DOWNLOADING!")
+    return "Your request has been submitted."
 
 
 

@@ -10,6 +10,35 @@ import os
 from yt_dlp.postprocessor import FFmpegPostProcessor
 FFmpegPostProcessor._ffmpeg_location.set('./')
 
+def scrape(url):
+    with yt_dlp.YoutubeDL() as ydl:
+        info_dict = ydl.extract_info(url, download=False)
+        if 'entries' in info_dict.keys():
+            # it's a playlist
+            return {
+                'type': 'playlist',
+                'id': info_dict.get('id'),
+                'title': info_dict.get('title'),
+                'uploader': info_dict.get('uploader'),
+                'thumbnail': info_dict.get('thumbnails')[-1].get('url'),
+                'thumbnails': info_dict.get('thumbnails'),
+                'videos': [{
+                    'id': video.get('id'),
+                    'title': video.get('title'),
+                    'uploader': video.get('uploader'),
+                    'thumbnail': video.get('thumbnail'),
+                    'thumbnails': info_dict.get('thumbnails')
+                } for video in info_dict.get('entries')]
+            }
+        else:
+            return {
+                'type': 'video',
+                'id': info_dict.get('id'),
+                'title': info_dict.get('title'),
+                'uploader': info_dict.get('uploader'),
+                'thumbnail': info_dict.get('thumbnail'),
+                'thumbnails': info_dict.get('thumbnails')
+            }
 
 
 def download(pkg):
