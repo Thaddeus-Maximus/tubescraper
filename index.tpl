@@ -50,6 +50,7 @@ function init() {
     select.appendChild(opt);
 
     if (url) {
+        document.getElementById('placeholder').innerText = 'Getting Video Data...';
         document.getElementById('url').value = url;
 
         var data = new FormData();
@@ -70,7 +71,7 @@ function init() {
             console.log(data);
 
             document.getElementById('video_preview').style.display = 'block';
-            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('placeholder').innerText = '';
 
             if (data['type'] == 'video') {
                 document.getElementById('video_preview_title').value = data['title'];
@@ -91,6 +92,7 @@ function init() {
 
         xhr.onerror = function() {
           alert("Request failed");
+          document.getElementById('placeholder').innerText = 'Failed to get video data';
         };
     }
 
@@ -112,7 +114,6 @@ function creatorSelectChange() {
     <button id="submit" type="submit">Get...</button></td></tr>
 </form>
 <div id="placeholder">
-    Fetching video data...
 </div>
 <div id="video_preview" style="display: none;">
     <form method="POST" id="video_preview_form" action="{{base_url}}download_video">

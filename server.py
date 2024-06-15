@@ -108,7 +108,7 @@ def download_video():
 
     #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
     #return template('index.tpl', base_url=base_url, creators=creators, url='', active_downloads=active_downloads)
-    redirect('/')
+    redirect(base_url)
 
 
 #application = bottle.default_app()
