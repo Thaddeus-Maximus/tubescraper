@@ -12,7 +12,7 @@ from bottle import route, request, post, run, template, response
 bottle.TEMPLATE_PATH.insert(0, "/var/www/tubescraper/")
 
 
-library_location = './library' # '/home/navidromeuser/library/pods/'
+library_location = '/home/navidromeuser/library/pods/'
 
 pool = multiprocessing.Pool(8)
 

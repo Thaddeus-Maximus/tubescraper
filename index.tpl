@@ -42,6 +42,7 @@ function init() {
         alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
       } else { // show the result
         //alert(`Done, got ${xhr.response.length} bytes`); // response is the server response
+        console.log(xhr.responseText);
         data = JSON.parse(xhr.responseText);
         console.log(data);
 
