@@ -29,7 +29,7 @@ function init() {
     data.append('url', url);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', './scrape', true);
+    xhr.open('POST', '/tubescraper/scrape', true);
     xhr.onload = function () {
         // do something to response
         console.log(this.responseText);
