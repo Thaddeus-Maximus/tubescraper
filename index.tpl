@@ -19,12 +19,34 @@ function refreshState(){
         data = JSON.parse(xhr.responseText);
         console.log(data);
 
-        document.getElementById('statusbox').innerHTML = xhr.responseText;
+        let list = document.getElementById("status_downloads");
+        while( list.firstChild ){ list.removeChild( list.firstChild ); }
+        for (i = 0; i < data['downloading'].length; ++i) {
+            let li = document.createElement('li');
+            li.innerText = data['downloading'][i]['title'] + ' by ' + data['downloading'][i]['artist'] + ' (' + data['downloading'][i]['vid'] + ')';
+            list.appendChild(li);
+        }
+
+        list = document.getElementById("status_completed");
+        while( list.firstChild ){ list.removeChild( list.firstChild ); }
+        for (i = 0; i < data['completed'].length; ++i) {
+            let li = document.createElement('li');
+            li.innerText = data['completed'][i]['title'] + ' by ' + data['completed'][i]['artist'] + ' (' + data['completed'][i]['vid'] + ')';
+            list.appendChild(li);
+        }
+
+        list = document.getElementById("status_failed");
+        while( list.firstChild ){ list.removeChild( list.firstChild ); }
+        for (i = 0; i < data['failed'].length; ++i) {
+            let li = document.createElement('li');
+            li.innerText = data['failed'][i]['title'] + ' by ' + data['failed'][i]['artist'] + ' (' + data['failed'][i]['vid'] + ')';
+            list.appendChild(li);
+        }
 
         if (data['downloading'].length == 0) {
             console.log("no more downloads in queue, stopping interval")
             clearInterval(intervalId);
-        }            
+        }
       }
     };
 }
@@ -136,6 +158,13 @@ function creatorSelectChange() {
         </table>
     </form>
 </div>
-<div id='statusbox'>
+<div>
+    <h3>Downloading:</h3>
+    <ul id='status_downloads'></ul>
+    <h3>Completed:</h3>
+    <ul id='status_completed'></ul>
+    <h3>Failed:</h3>
+    <ul id='status_failed'></ul>
+
 </div>
 </body>
