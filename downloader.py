@@ -66,6 +66,9 @@ def download(pkg):
         }
 
 
+        Path(root).mkdir(parents=True, exist_ok=True)
+
+
 
         attempts = 0
         while attempts < 30:
