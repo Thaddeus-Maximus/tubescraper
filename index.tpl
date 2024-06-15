@@ -74,8 +74,8 @@ function init() {
             document.getElementById('placeholder').innerText = '';
 
             if (data['type'] == 'video') {
-                document.getElementById('video_preview_title').value = data['title'].replace(/[a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('video_preview_channel').value = data['uploader'].replace(/[a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_title').value = data['title'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_channel').value = data['uploader'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('video_preview_thumbnail').src = data['thumbnail'];
                 document.getElementById('video_preview_id').value = data['id'];
             }
