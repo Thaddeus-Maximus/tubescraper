@@ -88,7 +88,7 @@ function creatorSelectChange() {
     Fetching video data...
 </div>
 <div id="video_preview" style="display: none;">
-    <form method="POST" id="video_preview_form" action="/download_video">
+    <form method="POST" id="video_preview_form" action="/tubescraper/download_video">
         <img id="video_preview_thumbnail"/>
         <input id="video_preview_url" name="url" type="text"/>
         <table>
