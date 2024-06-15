@@ -2,6 +2,32 @@
 
 let url = '{{! url}}';
 let creator_names = {{! creators}};
+let intervalId = 0;
+
+function refreshState(){ 
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{base_url}}get_downloads', true);
+    xhr.send();
+
+    // 4. This will be called after the response is received
+    xhr.onload = function() {
+      if (xhr.status != 200) { // analyze HTTP status of the response
+        alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+      } else { // show the result
+        //alert(`Done, got ${xhr.response.length} bytes`); // response is the server response
+        console.log(xhr.responseText);
+        data = JSON.parse(xhr.responseText);
+        console.log(data);
+
+        document.getElementById('statusbox').innerHTML = xhr.responseText;
+
+        if (data['downloading'].length == 0) {
+            console.log("no more downloads in queue, stopping interval")
+            clearInterval(intervalId);
+        }            
+      }
+    };
+}
 
 function init() {
     let select = document.getElementById('video_preview_creatorselect');
@@ -15,59 +41,60 @@ function init() {
         select.appendChild(opt);
     }
 
+    
+    intervalId = setInterval(refreshState, 10000);
+
     /*opt = document.createElement('option');
     opt.innerHTML = "New..."
     opt.value = '';*/
     select.appendChild(opt);
 
-    if (!url) return;
+    if (url) {
+        document.getElementById('url').value = url;
 
-    document.getElementById('url').value = url;
-    document.getElementById('video_preview_url').value = url;
+        var data = new FormData();
+        data.append('url', url);
 
-    var data = new FormData();
-    data.append('url', url);
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '{{base_url}}scrape', true);
+        xhr.send(data);
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/tubescraper/scrape', true);
-    xhr.onload = function () {
-        // do something to response
-        console.log(this.responseText);
-    };
-    xhr.send(data);
+        // 4. This will be called after the response is received
+        xhr.onload = function() {
+          if (xhr.status != 200) { // analyze HTTP status of the response
+            alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
+          } else { // show the result
+            //alert(`Done, got ${xhr.response.length} bytes`); // response is the server response
+            console.log(xhr.responseText);
+            data = JSON.parse(xhr.responseText);
+            console.log(data);
 
-    // 4. This will be called after the response is received
-    xhr.onload = function() {
-      if (xhr.status != 200) { // analyze HTTP status of the response
-        alert(`Error ${xhr.status}: ${xhr.statusText}`); // e.g. 404: Not Found
-      } else { // show the result
-        //alert(`Done, got ${xhr.response.length} bytes`); // response is the server response
-        console.log(xhr.responseText);
-        data = JSON.parse(xhr.responseText);
-        console.log(data);
+            document.getElementById('video_preview').style.display = 'block';
+            document.getElementById('placeholder').style.display = 'none';
 
-        document.getElementById('video_preview').style.display = 'block';
-        document.getElementById('placeholder').style.display = 'none';
+            if (data['type'] == 'video') {
+                document.getElementById('video_preview_title').value = data['title'];
+                document.getElementById('video_preview_channel').value = data['uploader'];
+                document.getElementById('video_preview_thumbnail').src = data['thumbnail'];
+                document.getElementById('video_preview_id').value = data['id'];
+            }
+          }
+        };
 
-        if (data['type'] == 'video') {
-            document.getElementById('video_preview_title').value = data['title'];
-            document.getElementById('video_preview_channel').value = data['uploader'];
-            document.getElementById('video_preview_thumbnail').src = data['thumbnail'];
-        }
-      }
-    };
+        xhr.onprogress = function(event) {
+          if (event.lengthComputable) {
+            //alert(`Received ${event.loaded} of ${event.total} bytes`);
+          } else {
+            //alert(`Received ${event.loaded} bytes`); // no Content-Length
+          }
+        };
 
-    xhr.onprogress = function(event) {
-      if (event.lengthComputable) {
-        //alert(`Received ${event.loaded} of ${event.total} bytes`);
-      } else {
-        //alert(`Received ${event.loaded} bytes`); // no Content-Length
-      }
-    };
+        xhr.onerror = function() {
+          alert("Request failed");
+        };
+    }
 
-    xhr.onerror = function() {
-      alert("Request failed");
-    };
+    refreshState();
 }
 
 
@@ -88,9 +115,9 @@ function creatorSelectChange() {
     Fetching video data...
 </div>
 <div id="video_preview" style="display: none;">
-    <form method="POST" id="video_preview_form" action="/tubescraper/download_video">
+    <form method="POST" id="video_preview_form" action="{{base_url}}download_video">
         <img id="video_preview_thumbnail"/>
-        <input id="video_preview_url" name="url" type="text"/>
+        <input id="video_preview_id" name="id" type="text" hidden/>
         <table>
             <tr>
                 <td><label for="">Title</label></td>
@@ -107,5 +134,7 @@ function creatorSelectChange() {
             </tr>
         </table>
     </form>
+</div>
+<div id='statusbox'>
 </div>
 </body>

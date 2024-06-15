@@ -42,74 +42,80 @@ def scrape(url):
 
 
 def download(pkg):
+    print("downloader here!")
+    print("downloading", pkg)
+    try:
+        artist = pkg["artist"]
+        #album  = pkg["album"]
+        title = pkg["title"]
+        #track = pkg["track"]
+        root   = pkg["root"]
+        vid    = pkg["vid"]
+        #queue  = pkg["queue"]
 
-    artist = pkg["artist"]
-    #album  = pkg["album"]
-    title = pkg["title"]
-    #track = pkg["track"]
-    root   = pkg["root"]
-    vid    = pkg["vid"]
+        url = "https://youtube.com/watch?v=%s" % vid
 
-    url = "https://youtube.com/watch?v=%s" % vid
+        print(artist, title, url)
 
-    print(artist, title, url)
-
-    ydl_opts = {
-        "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
-        "outtmpl": '%(id)s',
-        "quiet": True,
-        "no_warnings": True
-        #"user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
-    }
+        ydl_opts = {
+            "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
+            "outtmpl": '%(id)s',
+            "quiet": True,
+            "no_warnings": True
+            #"user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+        }
 
 
 
-    attempts = 0
-    while attempts < 30:
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                error_code = ydl.download(url)
-            break
-        except:
-            attempts += 1
-    else:
-        print("FAILURE: %s (%s)" % (vid, title))
-        return False
+        attempts = 0
+        while attempts < 30:
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    error_code = ydl.download(url)
+                break
+            except:
+                attempts += 1
+        else:
+            print("FAILURE: %s (%s)" % (vid, title))
+            return False
 
-    oldfn = [filename for filename in os.listdir('.') if filename.startswith(vid)][0]
-    newfn = '%s/%s.mp3' % (root, title)
-    """newvidfn = '%s/%s.mp4' % (root, title)
+        oldfn = [filename for filename in os.listdir('.') if filename.startswith(vid)][0]
+        newfn = '%s/%s.mp3' % (root, title)
+        """newvidfn = '%s/%s.mp4' % (root, title)
 
-    subprocess.run(["ffmpeg", "-y", "-i", oldfn,
-        "-metadata", "title=%s"%title,
-        "-metadata", "artist=%s"%artist,
-        #"-metadata", "album=%s"%album,
-        #"-metadata", "track=%d"%track,
-        newvidfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)"""
+        subprocess.run(["ffmpeg", "-y", "-i", oldfn,
+            "-metadata", "title=%s"%title,
+            "-metadata", "artist=%s"%artist,
+            #"-metadata", "album=%s"%album,
+            #"-metadata", "track=%d"%track,
+            newvidfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)"""
 
-    subprocess.run(["ffmpeg", "-y", "-i", oldfn,
-        #"-i", root+'/album.jpg',
-        #"-c:v", "copy",
-        #"-map", "0:a", "-map", "1:v",
-        "-b:a", "128k",
+        subprocess.run(["ffmpeg", "-y", "-i", oldfn,
+            #"-i", root+'/album.jpg',
+            #"-c:v", "copy",
+            #"-map", "0:a", "-map", "1:v",
+            "-b:a", "128k",
 
-        #"-metadata:s:t", "mimetype=image/jpeg", "-metadata:s:t", "filename=%s"%(root+"/album.jpg"),
-        
-        "-id3v2_version", "3",
-        
-        "-metadata:s:v", "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\"",
-        "-metadata", "title=%s"%title,
-        "-metadata", "artist=%s"%artist,
-        #"-metadata", "album=%s"%album,
-        #"-metadata", "track=%d"%track,
-        newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            #"-metadata:s:t", "mimetype=image/jpeg", "-metadata:s:t", "filename=%s"%(root+"/album.jpg"),
+            
+            "-id3v2_version", "3",
+            
+            "-metadata:s:v", "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\"",
+            "-metadata", "title=%s"%title,
+            "-metadata", "artist=%s"%artist,
+            #"-metadata", "album=%s"%album,
+            #"-metadata", "track=%d"%track,
+            newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    print("CONVERTED!", oldfn, newfn)
+        print("CONVERTED!", oldfn, newfn)
 
-    Path(oldfn).unlink()
+        Path(oldfn).unlink()
 
-    print("Success: %s (%s)" % (vid, title))
-    return True
+        print("Success: %s (%s)" % (vid, title))
+        return 'success'
+    except Exception as e:
+        print("Error downloading %s" % vid, e)
+        return 'error'
 
 if __name__ == "__main__":
 

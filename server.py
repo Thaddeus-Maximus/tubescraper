@@ -9,10 +9,51 @@ import downloader
 import re
 import bottle
 bottle.debug(True)
-from bottle import route, request, post, run, template, response
+from bottle import route, request, post, run, template, response, redirect
 bottle.TEMPLATE_PATH.insert(0, server_location)
 
-pool = multiprocessing.Pool(8)
+pool  = multiprocessing.Pool(8)
+
+"""
+queue = multiprocessing.Queue()
+
+active_downloads = {}
+
+def update_downloader_state():
+    try:
+        while True:
+            update = queue.get(False)
+            print("got update: ", update)
+            active_downloads[update[0]]['status'] = update[1]
+    except:
+        pass
+
+
+def downloader_callback(result):
+    global active_downloads
+    print("thread finished", result)
+    active_downloads[result['id']] = result
+"""
+
+runners = []
+completed = []
+failed = []
+
+@route('/get_downloads', method='GET')
+def scrape():
+    for runner in runners[:]:
+        if runner[1].ready():
+            runners.remove(runner)
+            result = runner[1].get()
+            if result == 'error':
+                failed.append(runner[0])
+            else:
+                completed.append(runner[0])
+    return json.dumps({
+        'completed': completed,
+        'failed': failed,
+        'downloading': [x[0] for x in runners]
+    })
 
 @route('/hello')
 def index():
@@ -24,12 +65,14 @@ def index_GET():
     #creators = ["Jonathan Pageau", "Jordan Peterson", "Alex Jones"]
     #return template('index.tpl', creators=json.dumps(creators), msg="...")
 
+    #update_downloader_state()
+
     creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
 
     if 'url' in request.query:
         url = request.query['url']
-        return template('index.tpl', creators=creators, url=url)
-    return template('index.tpl', creators=creators, url='')
+        return template('index.tpl', base_url=base_url, creators=creators, url=url)
+    return template('index.tpl',     base_url=base_url, creators=creators, url='')
 
 @post('/scrape')
 def scrape():
@@ -45,30 +88,27 @@ def download_video():
 
     if not data.get('channel'):
         return 'You need to specify a creator'
-    if not data.get('url'):
-        return 'You need to specify a URL'
+    if not data.get('id'):
+        return 'You need to specify a video id'
     if not data.get('title'):
         return "You need to specify a title"
-
-    print(repr(data.get('url')))
-
-    match = re.search(r"watch\?v=([\w+-]*)", str(data.get('url')))
-    print(match)
-    vid = match[1]
 
     pkg = {
        "artist": data.get('channel'),
        "title":  data.get('title'),
        "root":  os.path.join(library_location, data.get('channel')),
-       "vid": vid
+       "vid": data.get('id')
     }
 
-    pool.apply_async(downloader.download, (pkg,))
+    print("pkg: ", pkg)
 
-    creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
+    runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
+    print("running downloader")
 
-    return "Your request has been submitted."
 
+    #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
+    #return template('index.tpl', base_url=base_url, creators=creators, url='', active_downloads=active_downloads)
+    redirect('/')
 
 
 #application = bottle.default_app()
