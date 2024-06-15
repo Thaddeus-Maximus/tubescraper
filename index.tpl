@@ -74,8 +74,8 @@ function init() {
             document.getElementById('placeholder').innerText = '';
 
             if (data['type'] == 'video') {
-                document.getElementById('video_preview_title').value = data['title'];
-                document.getElementById('video_preview_channel').value = data['uploader'];
+                document.getElementById('video_preview_title').value = data['title'].replace(/[a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_channel').value = data['uploader'].replace(/[a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('video_preview_thumbnail').src = data['thumbnail'];
                 document.getElementById('video_preview_id').value = data['id'];
             }
@@ -122,11 +122,11 @@ function creatorSelectChange() {
         <table>
             <tr>
                 <td><label for="">Title</label></td>
-                <td><input id="video_preview_title" name="title" type="text" pattern="[a-zA-Z0-9\s\-\+]+"/></td>
+                <td><input id="video_preview_title" name="title" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
             </tr>
             <tr>
                 <td><label for="">Channel</label></td>
-                <td><input id="video_preview_channel" name="channel" type="text" pattern="[a-zA-Z0-9\s\-\+]+"/></td>
+                <td><input id="video_preview_channel" name="channel" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
                 <td><select id="video_preview_creatorselect" onchange="creatorSelectChange();"></select></td>
             </tr>
             <tr>   
