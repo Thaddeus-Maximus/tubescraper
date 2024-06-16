@@ -14,6 +14,9 @@ bottle.TEMPLATE_PATH.insert(0, server_location)
 
 pool  = multiprocessing.Pool(8)
 
+import videodb
+videodb.load(os.path.join(library_location, 'videos.md'))
+
 """
 queue = multiprocessing.Queue()
 
@@ -86,24 +89,41 @@ def scrape():
 def download_video():
     data = request.forms
 
-    if not data.get('channel'):
-        return 'You need to specify a creator'
-    if not data.get('id'):
-        return 'You need to specify a video id'
-    if not data.get('title'):
-        return "You need to specify a title"
+    print({i:data.get(i) for i in data.keys()})
+
+    title  = data.get('title')
+    vid    = data.get('id')
+    artist = data.get('artist')
+    album  = data.get('album')
+    img    = data.get('img')
+
+    if not artist:
+        return 'No artist specified'
+    if not album:
+        return 'No album specified'
+    if not vid:
+        return 'No video ID specified'
+    if not title:
+        return "No title specified"
+
+    print(library_location, artist, album)
+    videodb.add(artist, album, title, vid)
 
     pkg = {
-       "artist": data.get('channel'),
-       "title":  data.get('title'),
-       "root":  os.path.join(library_location, data.get('channel')),
-       "vid": data.get('id')
+       "artist": artist,
+       "album":  album,
+       "title":  title,
+       "img":    img,
+       "root":  os.path.join(os.path.join(library_location, artist), album),
+       "vid": vid,
+       "track": len(videodb.db[artist][album])
     }
 
     print("pkg: ", pkg)
 
     runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
     print("running downloader")
+
 
 
     #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]

@@ -46,11 +46,12 @@ def download(pkg):
     print("downloading", pkg)
     try:
         artist = pkg["artist"]
-        #album  = pkg["album"]
-        title = pkg["title"]
-        #track = pkg["track"]
+        album  = pkg["album"]
+        title  = pkg["title"]
+        track  = pkg["track"]
         root   = pkg["root"]
         vid    = pkg["vid"]
+        img    = pkg["img"]
         #queue  = pkg["queue"]
 
         url = "https://youtube.com/watch?v=%s" % vid
@@ -93,10 +94,15 @@ def download(pkg):
             #"-metadata", "track=%d"%track,
             newvidfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)"""
 
+
+        img_data = requests.get(img).content
+        with open(root+'/tmp.jpg', 'wb') as handler:
+            handler.write(img_data)
+
         subprocess.run(["ffmpeg", "-y", "-i", oldfn,
-            #"-i", root+'/album.jpg',
-            #"-c:v", "copy",
-            #"-map", "0:a", "-map", "1:v",
+            "-i", root+'/tmp.jpg',
+            "-c:v", "copy",
+            "-map", "0:a", "-map", "1:v",
             "-b:a", "128k",
 
             #"-metadata:s:t", "mimetype=image/jpeg", "-metadata:s:t", "filename=%s"%(root+"/album.jpg"),
@@ -106,13 +112,14 @@ def download(pkg):
             "-metadata:s:v", "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\"",
             "-metadata", "title=%s"%title,
             "-metadata", "artist=%s"%artist,
-            #"-metadata", "album=%s"%album,
-            #"-metadata", "track=%d"%track,
+            "-metadata", "album=%s"%album,
+            "-metadata", "track=%d"%track,
             newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         print("CONVERTED!", oldfn, newfn)
 
         Path(oldfn).unlink()
+        Path(root+'/tmp.jpg').unlink()
 
         print("Success: %s (%s)" % (vid, title))
         return 'success'

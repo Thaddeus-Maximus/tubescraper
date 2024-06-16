@@ -1,13 +1,13 @@
-##### NOTE: ONLY USE ALPHANUMERICS and +-,.'" IN TITLES
-
-### No Boilerplate
+# No Boilerplate
+## No Boilerplate
 [The Cult of Done](https://www.youtube.com/watch?v=bJQj1uKtnus)
 [The Unreasonable Effectiveness of Plain Text](https://www.youtube.com/watch?v=WgV6M1LyfNY)
 [How to Speak Rust](https://www.youtube.com/watch?v=bu_gulee89Q)
 [Hack Your Brain With Elaborate Coping Mechanisms](https://www.youtube.com/watch?v=XUZ9VATeF_4)
 [How to Learn Rust](https://www.youtube.com/watch?v=2hXNd6x9sZs)
 
-### harmony
+# harmony
+## harmony
 [This Word is the True Purpose of Human Life](https://www.youtube.com/watch?v=E2x2WTWjcEA)
 [This Photo was Taken 11 Months After His Funeral](https://www.youtube.com/watch?v=-dBdJ7kyqyo)
 [God's Revelation to the Human Heart](https://www.youtube.com/watch?v=T1HBRRcFFTs)
@@ -19,7 +19,8 @@
 [The Mystery of the Eastern Orthodox Church](https://www.youtube.com/watch?v=kbqcLpxbHl4)
 [A Monastery 150 Feet up in the Air](https://www.youtube.com/watch?v=IOjfzRr3LQ0)
 
-### struthless
+# struthless
+## struthless
 [The VOMIT System](https://www.youtube.com/watch?v=U8RQsJ0Q3Mo)
 [24 Bits of Life Advice](https://www.youtube.com/watch?v=0DKlSt0j8dY)
 [7 Habits of Highly Miserable People](https://www.youtube.com/watch?v=BagISaCKuqE)
@@ -28,14 +29,16 @@
 [How to Monetize Creativity without Social Media](https://www.youtube.com/watch?v=3jFa-kLB_cQ)
 [How the Internet Kills your Creativity](https://www.youtube.com/watch?v=-Qo3ehkykkM)
 
-### Tom Sachs
+# Tom Sachs
+## Tom Sachs
 [10 Bullets](https://www.youtube.com/watch?v=49p1JVLHUos)
 [Paradox Bullets](https://www.youtube.com/watch?v=-Evrm03Y5hI)
 [Authenticity](https://www.youtube.com/watch?v=N65i64lCho4)
 [Advice to the Young](https://www.youtube.com/watch?v=oP45EdNznOY)
 [Success in spite of creativity](https://www.youtube.com/watch?v=V8aeaX6Kozw)
 
-### IMBeggar
+# IMBeggar
+## IMBeggar
 [Talk With God, Not At Him](https://www.youtube.com/watch?v=eGqQKmvN8T0)
 [Why Doesnt God Just Show Himself](https://www.youtube.com/watch?v=CZZOaXkLGMY)
 [10 Tips to Overcome Temptation](https://www.youtube.com/watch?v=tcDLgG5HiDQ)
@@ -44,7 +47,8 @@
 [Finding Purpose](https://www.youtube.com/watch?v=ZFsXLyey-sM)
 [How to Get Closer to God](https://www.youtube.com/watch?v=vxeI7RXnCIk)
 
-### Dry Creek Wrangler
+# Dry Creek Wrangler
+## Dry Creek Wrangler
 [The Test is NOT The Test](https://www.youtube.com/watch?v=UoMaxMPGU3s)
 [When You Just Ain't Got it All Together](https://www.youtube.com/watch?v=U0-ttGGB7b4)
 [Life Itself Prepares Us For Life](https://www.youtube.com/watch?v=Ir5zQdZfoQk)
@@ -52,7 +56,8 @@
 [You Messed Up...Now What](https://www.youtube.com/watch?v=_MHQCH9v9rc)
 [I Study Like I Eat Chinese Food](https://www.youtube.com/watch?v=LOVncxntFLw)
 
-### Van Neistat
+# Van Neistat
+## Van Neistat
 [WORK AND REST](https://www.youtube.com/watch?v=Uvk7pGmH6gs)
 [WOMEN](https://www.youtube.com/watch?v=rTYH943jiEo)
 [LUCK](https://www.youtube.com/watch?v=6P87trqm1VU)
@@ -76,10 +81,10 @@
 [OBJECT VISUALIZERS](https://www.youtube.com/watch?v=Q_lg6b0Osfo)
 [ART WORKERS](https://www.youtube.com/watch?v=lMJ_kLLgXFM)
 [RIDE](https://www.youtube.com/watch?v=kiJV5a8H_xc)
-[AMBITION](https://www.youtube.com/watch?v=tt5T5S5IPsQ)
 [SACRED OBJECTS](https://www.youtube.com/watch?v=k4jQNjER06Y)
 
-### Fulton Sheen
+# Fulton Sheen
+## Fulton Sheen
 [Humanity of Christ](https://www.youtube.com/watch?v=_I15uF2tmUA)
 [Our Cross](https://www.youtube.com/watch?v=Fmu-E3WDIEg)
 [Body of Christ](https://www.youtube.com/watch?v=RVcbt-Ra1jw)
@@ -102,8 +107,8 @@
 [The Devil and the Diabolic](https://www.youtube.com/watch?v=jKC2PSOZjB4)
 [Wasting Your Life](https://www.youtube.com/watch?v=5e5oPIHnHQs)
 
-
-### New Polity
+# New Polity
+## New Polity
 [Life Without Technology - Eric Brende](https://www.youtube.com/watch?v=IRb6cmm9GMY)
 [Good Soil - Milk](https://www.youtube.com/watch?v=plSavJi0zLw)
 [Good Soil - Why You Should Garden](https://www.youtube.com/watch?v=0oS4zGjuIso)
@@ -122,17 +127,21 @@
 [Americas Decline into Paganism](https://www.youtube.com/watch?v=DegXefWvYDY)
 [Fighting Against Legalized Euthanasia](https://www.youtube.com/watch?v=600EdxiktNc)
 
-### Triggernometry
+# Triggernometry
+## Triggernometry
 [Why Young Men Feel Lost](https://www.youtube.com/watch?v=Pjh6L0BU5BU)
 
-### Pints w Aquinas
+# Pints w Aquinas
+## Pints w Aquinas
 [Fr Malachy Napier](https://www.youtube.com/watch?v=G8HE5AUoWhY)
 [Andrew Willard Jones](https://www.youtube.com/watch?v=O91kCJONbdk)
 
-### Wendell Berry
+# Wendell Berry
+## Wendell Berry
 [The Land, The People, and a Proper Economy](https://www.youtube.com/watch?v=hstD5UPkWQM)
 
-### Johnathan Pageau
+# Johnathan Pageau
+## Johnathan Pageau
 [The End of Desacrilization in Art](https://www.youtube.com/watch?v=1WYh20sYBsQ)
 [The Magic of the Creative Process](https://www.youtube.com/watch?v=S5hTzorhQys)
 [Revelation and Rebellion](https://www.youtube.com/watch?v=mWcKXrBm7R4)
@@ -140,27 +149,33 @@
 [A New Image of Everything w Aidan Hart](https://www.youtube.com/watch?v=5KYqlzhZqMg)
 [Becoming Gods Without God](https://www.youtube.com/watch?v=BCIRA9wRkIA)
 
-### Luke Smith
+# Luke Smith
+## Luke Smith
 [What's Natural, Anyways](https://www.youtube.com/watch?v=ucn2KzCDnOY)
 
-### Essential Craftsman
+# Essential Craftsman
+## Essential Craftsman
 [How to be More Productive](https://www.youtube.com/watch?v=qP1AmDRhoas)
 [A Tradesmans Life Perspective at 65](https://www.youtube.com/watch?v=oJNw82Neocc)
 
-### Sensus Fidelium
+# Sensus Fidelium
+## Sensus Fidelium
 [Now For Tomorrow will be Too Late](https://www.youtube.com/watch?v=Udc3pC2X5i4)
 [Laziness Sloth and Workaholicism](https://www.youtube.com/watch?v=A64JjtQkOFk)
 [Shop Talk w. Father Ripperger](https://www.youtube.com/watch?v=jBd728ZVCPA)
 
-### Jordan Peterson
+# Jordan Peterson
+## Jordan Peterson
 [Does God Speak to You](https://www.youtube.com/watch?v=B-MIrDCipTQ)
 
-### Misc
+# Misc
+## Misc
 [Stations of the Eucharist](https://www.youtube.com/watch?v=cUNkocjtA4w)
 [consume like an artist.](https://www.youtube.com/watch?v=a0Ai5koQ2p8)
 [Just Be Bored, and You'll Level Up](https://www.youtube.com/watch?v=EpCC5fp096g)
 
-### Regenerative Ag Podcast
+# Regenerative Ag Podcast
+## Regenerative Ag Podcast
 [Episode 112 Transforming Arid Landscapes with Taimur Malik](https://www.youtube.com/watch?v=G6sTuOj67fM)
 [Episode 111 Questioning Farm Management Traditions with Boe Clausen](https://www.youtube.com/watch?v=rhIwNj_kj9c)
 [Episode 110 Stock Cropping and Regenerative Innovation with Zack Smith](https://www.youtube.com/watch?v=3dP_0RtRtbI)
@@ -270,9 +285,11 @@
 [Disease Resistance and Regenerating Soil with Dr Michael McNeill](https://www.youtube.com/watch?v=XJIx_VxuaFA)
 
 # Days of Equipping
+## Days of Equipping
 [The Kerygma](https://www.youtube.com/watch?v=u55SpF6WCfY)
 [The Mission pt 1](https://www.youtube.com/watch?v=nmNMKp9gIak)
 [The Mission pt 2](https://www.youtube.com/watch?v=ADHNoAROg20)
 
 # The Natural Theologian
+## The Natural Theologian
 [Dont Share the Gospel Yet](https://www.youtube.com/watch?v=4PjbcaBGwVc)
