@@ -112,7 +112,7 @@ def scrape(url):
                 'title': info_dict.get('title'),
                 'uploader': info_dict.get('uploader'),
                 'thumbnail': info_dict.get('thumbnail'),
-                'thumbnails': info_dict.get('thumbnails')
+                'thumbnails': [info_dict.get('thumbnail')] + [x.get('url') for x in info_dict.get('thumbnails')]
             }
 
 

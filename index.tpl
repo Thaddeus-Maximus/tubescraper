@@ -258,7 +258,7 @@ function cycleThumbnail() {
     active_thumbnail++;
     if (active_thumbnail >= thumbnails.length)
         active_thumbnail = 0;
-    newThumb = thumbnails[active_thumbnail].url;
+    newThumb = thumbnails[active_thumbnail];
     document.getElementById('video_preview_img').value        = newThumb;
     document.getElementById('video_preview_thumbnail').src    = newThumb;
     document.getElementById('playlist_preview_img').value     = newThumb;
