@@ -11,6 +11,81 @@ from yt_dlp.postprocessor import FFmpegPostProcessor
 FFmpegPostProcessor._ffmpeg_location.set('./')
 
 def scrape(url):
+    """if 'music' in url:
+        print("Booting firefox to scrape...")
+
+        opts = webdriver.FirefoxOptions()
+        opts.headless = True # this doesn't work on windows... at least right now
+        driver = None
+        if os.name == 'nt':
+            # windows
+            opts.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
+            driver = webdriver.Firefox(options=opts, service=Service(executable_path='geckodriver.exe'))   #<---Add path to your geckodriver
+        else:
+            driver = webdriver.Firefox(options=opts, service=Service(executable_path='./geckodriver'))   #<---Add path to your geckodriver
+
+        #headers = {'User-Agent': 'Mozilla/5.0 (Linux; Android 5.1.1; SM-G928X Build/LMY47X) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.83 Mobile Safari/537.36'}
+
+        for playlist in playlists:
+            driver.get(playlist)
+
+            soup = BeautifulSoup(driver.page_source, features="lxml")
+
+            vids = []
+            titles = {}
+            tracks = {}
+
+            #print(soup)
+            album = str(soup.find("yt-formatted-string", class_="title style-scope ytmusic-detail-header-renderer").string)
+            artist = ""
+
+            links = soup.find_all("a", class_="yt-simple-endpoint style-scope yt-formatted-string")
+
+            i = 1
+            for link in links:
+                match = re.search('watch\\?v=([-A-Za-z0-9\\-_]{1,50})', link.get('href'))
+                if match:
+                    vid = match.group(1)
+                    vids.append(vid)
+                    titles[vid] = str(link.text)
+                    tracks[vid] = i
+                    i += 1
+                else:
+                    artist = str(link.text)
+
+            with open('tmp.html', 'w') as f:
+                f.write(soup.prettify())
+
+            print(vids)
+            print(titles)
+            print("Album: ", album)
+            print("Artist: ", artist)
+
+            if not yesmode:
+                print("Correct? [Y/n]: ")
+                if input() != 'Y':
+                    exit()
+
+            root = "%s/%s" % (sanitize(artist), sanitize(album))
+
+            Path(root).mkdir(parents=True, exist_ok=True)
+
+
+            img = soup.find(id="img")['src']
+            img_data = requests.get(img).content
+            with open(root+'/album.jpg', 'wb') as handler:
+                handler.write(img_data)
+
+            pkg = [{
+                "artist": artist,
+                "album": album,
+                "title": titles[x],
+                "track": tracks[x],
+                "root": root,
+                "vid": x
+            } for x in vids]
+
+    else:"""
     with yt_dlp.YoutubeDL() as ydl:
         info_dict = ydl.extract_info(url, download=False)
         if 'entries' in info_dict.keys():
@@ -96,11 +171,11 @@ def download(pkg):
 
 
         img_data = requests.get(img).content
-        with open(root+'/tmp.jpg', 'wb') as handler:
+        with open(os.path.join(root, '%s.jpg' % vid), 'wb') as handler:
             handler.write(img_data)
 
         subprocess.run(["ffmpeg", "-y", "-i", oldfn,
-            "-i", root+'/tmp.jpg',
+            "-i", os.path.join(root, '%s.jpg' % vid),
             "-c:v", "copy",
             "-map", "0:a", "-map", "1:v",
             "-b:a", "128k",
@@ -119,7 +194,7 @@ def download(pkg):
         print("CONVERTED!", oldfn, newfn)
 
         Path(oldfn).unlink()
-        Path(root+'/tmp.jpg').unlink()
+        Path(os.path.join(root, '%s.jpg' % vid)).unlink()
 
         print("Success: %s (%s)" % (vid, title))
         return 'success'

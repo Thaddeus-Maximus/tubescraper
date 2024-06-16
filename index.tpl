@@ -150,6 +150,9 @@ function refreshState(){
     };
 }
 
+let thumbnails = [];
+let active_thumbnail = 0;
+
 function init() {
     let select = document.getElementById('video_preview_creatorselect');
     let i=0;
@@ -192,16 +195,44 @@ function init() {
             data = JSON.parse(xhr.responseText);
             console.log(data);
 
-            document.getElementById('video_preview').style.display = 'block';
             document.getElementById('placeholder').innerText = '';
 
             if (data['type'] == 'video') {
-                document.getElementById('video_preview_title').value  = data['title'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('video_preview_artist').value = data['uploader'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('video_preview_album').value  = data['uploader'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('video_preview_thumbnail').src = data['thumbnail'];
-                document.getElementById('video_preview_img').value = data['thumbnail'];
-                document.getElementById('video_preview_id').value = data['id'];
+                thumbnails = data.thumbnails;
+                active_thumbnail = 0;
+                document.getElementById('video_preview').style.display = 'block';
+                document.getElementById('playlist_preview').style.display = 'none';
+                document.getElementById('video_preview_title').value  = (data['title'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_artist').value = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_album').value  = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('video_preview_thumbnail').src = thumbnails[0].url;
+                document.getElementById('video_preview_img').value = thumbnails[0].url;
+                document.getElementById('video_preview_id').value = (data['id'] ?? '');
+            } else if (data['type'] == 'playlist') {
+                thumbnails = data.thumbnails;
+                active_thumbnail = 0;
+                document.getElementById('playlist_preview').style.display = 'block';
+                document.getElementById('video_preview').style.display = 'none';
+                //document.getElementById('playlist_preview_title').value   = data['title'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('playlist_preview_artist').value   = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('playlist_preview_album').value    = (data['title'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                document.getElementById('playlist_preview_thumbnail').src  = thumbnails[0].url;
+                document.getElementById('playlist_preview_img').value      = thumbnails[0].url;
+                document.getElementById('playlist_preview_id').value       = data['id'] ?? '';
+                document.getElementById('playlist_preview_n_videos').value = data['videos'].length;
+
+                let table = document.getElementById('playlist_preview_table');
+                while( table.firstChild ){ table.removeChild( table.firstChild ); }
+                for (i=0; i<data['videos'].length; i++) {
+                    let video = data['videos'][i];
+                    console.log('video', i, video);
+                    let tr = document.createElement('tr');
+                    let title = video.title.replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
+                    tr.innerHTML = `<td><label>${i}</label></td><td><input name="id_${i}" value="${video.id}" hidden/><input type="text" name="title_${i}" value="${title}"/></td>`;
+                    table.appendChild(tr);
+                }
+            } else {
+                alert("weird type of thing");
             }
           }
         };
@@ -223,10 +254,22 @@ function init() {
     refreshState();
 }
 
+function cycleThumbnail() {
+    active_thumbnail++;
+    if (active_thumbnail >= thumbnails.length)
+        active_thumbnail = 0;
+    newThumb = thumbnails[active_thumbnail].url;
+    document.getElementById('video_preview_img').value        = newThumb;
+    document.getElementById('video_preview_thumbnail').src    = newThumb;
+    document.getElementById('playlist_preview_img').value     = newThumb;
+    document.getElementById('playlist_preview_thumbnail').src = newThumb;
+}
 
 function creatorSelectChange() {
     let creator = document.getElementById('video_preview_creatorselect').value;
     document.getElementById('video_preview_artist').value = creator;
+    creator = document.getElementById('playlist_preview_creatorselect').value;
+    document.getElementById('playlist_preview_artist').value = creator;
 }
 
 </script>
@@ -246,7 +289,7 @@ function creatorSelectChange() {
 <div id="video_preview" style="display: none;">
     <h1>Confirm Video Details</h1>
     <form method="POST" id="video_preview_form" action="{{base_url}}download_video">
-        <img id="video_preview_thumbnail"/>
+        <img id="video_preview_thumbnail" onclick="cycleThumbnail();"/>
         <input id="video_preview_id" name="id" type="text" hidden/>
         <input id="video_preview_img" name="img" type="text" hidden/>
         <table>
@@ -269,6 +312,27 @@ function creatorSelectChange() {
             </tr>
         </table>
     </form>
+</div>
+<div id="playlist_preview" style="display: none;">
+    <h1>Confirm Playlist Details</h1>
+    <form method="POST" id="playlist_preview_form" action="{{base_url}}download_playlist">
+        <img id="playlist_preview_thumbnail" onclick="cycleThumbnail();"/>
+        <input id="playlist_preview_id" name="id" type="text" hidden/>
+        <input id="playlist_preview_img" name="img" type="text" hidden/>
+        <input id="playlist_preview_n_videos" name="n_videos" type="text" hidden/>
+        <table>
+            <tr>
+                <td><label for="artist">Artist</label></td>
+                <td><input id="playlist_preview_artist" name="artist" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
+                <td><select id="playlist_preview_creatorselect" onchange="creatorSelectChange();"></select></td>
+            </tr>
+            <tr>
+                <td><label for="album">Album</label></td>
+                <td><input id="playlist_preview_album" name="album" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
+            </tr>
+        </table>
+        <table id="playlist_preview_table"></table>
+        <button id="submit" type="submit">Download!</button>
 </div>
 <div>
     <br/>

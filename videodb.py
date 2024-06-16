@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 
 """
 artist
@@ -27,7 +28,7 @@ def load(filename):
             if match:
                 album = match[1]
                 print('album: ', album)
-                db[artist][album] = {}
+                db[artist][album] = OrderedDict()
                 
                 continue
 
@@ -35,7 +36,7 @@ def load(filename):
             if match:
                 artist = match[1]
                 print('artist: ', artist)
-                db[artist] = {}
+                db[artist] = OrderedDict()
                 
                 continue
 
@@ -48,11 +49,13 @@ def load(filename):
 def add(artist, album, title, vid):
     global fn
     if not artist in db:
-        db[artist] = {}
+        db[artist] = OrderedDict()
     if not album in db[artist]:
-        db[artist][album] = {}
+        db[artist][album] = OrderedDict()
     db[artist][album][title] = vid
 
+def commit():
+    global fn
     with open(fn, 'w') as f:
         for artist in db:
             f.write('# %s\n' % artist)

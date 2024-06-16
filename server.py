@@ -85,11 +85,49 @@ def scrape():
         return json.dumps(scraped)
     return json.dumps({'error': 'no url provided'})
 
+@post('/download_playlist')
+def download_playlist():
+    data = request.forms
+
+    vid    = data.get('id')
+    artist = data.get('artist')
+    album  = data.get('album')
+    img    = data.get('img')
+    n_videos = data.get('n_videos')
+
+    if not artist:
+        return 'No artist specified'
+    if not album:
+        return 'No album specified'
+    if not vid:
+        return 'No video ID specified'
+
+    for i in range(int(n_videos)):
+        title = data.get('title_%d' % i);
+        vid   = data.get('id_%d' % i)
+        videodb.add(artist, album, title, vid)
+
+        pkg = {
+           "artist": artist,
+           "album":  album,
+           "title":  title,
+           "img":    img,
+           "root":   os.path.join(os.path.join(library_location, artist), album),
+           "vid":    vid,
+           "track":  i+1
+        }
+
+        runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
+
+    videodb.commit()
+
+    redirect(base_url)
+
 @post('/download_video')
 def download_video():
     data = request.forms
 
-    print({i:data.get(i) for i in data.keys()})
+    # print({i:data.get(i) for i in data.keys()})
 
     title  = data.get('title')
     vid    = data.get('id')
@@ -106,7 +144,7 @@ def download_video():
     if not title:
         return "No title specified"
 
-    print(library_location, artist, album)
+    # print(library_location, artist, album)
     videodb.add(artist, album, title, vid)
 
     pkg = {
@@ -114,20 +152,15 @@ def download_video():
        "album":  album,
        "title":  title,
        "img":    img,
-       "root":  os.path.join(os.path.join(library_location, artist), album),
-       "vid": vid,
-       "track": len(videodb.db[artist][album])
+       "root":   os.path.join(os.path.join(library_location, artist), album),
+       "vid":    vid,
+       "track":  len(videodb.db[artist][album])
     }
 
-    print("pkg: ", pkg)
-
     runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
-    print("running downloader")
 
+    videodb.commit()
 
-
-    #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
-    #return template('index.tpl', base_url=base_url, creators=creators, url='', active_downloads=active_downloads)
     redirect(base_url)
 
 
