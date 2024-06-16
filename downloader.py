@@ -95,14 +95,14 @@ def scrape(url):
                 'id': info_dict.get('id'),
                 'title': info_dict.get('title'),
                 'uploader': info_dict.get('uploader'),
-                'thumbnail': info_dict.get('thumbnails')[-1].get('url'),
-                'thumbnails': info_dict.get('thumbnails'),
+                #'thumbnail': info_dict.get('thumbnails')[-1].get('url'),
+                'thumbnails': [x.get('url') for x in info_dict.get('thumbnails')],
                 'videos': [{
                     'id': video.get('id'),
                     'title': video.get('title'),
                     'uploader': video.get('uploader'),
-                    'thumbnail': video.get('thumbnail'),
-                    'thumbnails': info_dict.get('thumbnails')
+                    #'thumbnail': video.get('thumbnail'),
+                    'thumbnails': [video.get('thumbnail')] + [x.get('url') for x in info_dict.get('thumbnails')]
                 } for video in info_dict.get('entries')]
             }
         else:

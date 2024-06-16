@@ -205,8 +205,8 @@ function init() {
                 document.getElementById('video_preview_title').value  = (data['title'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('video_preview_artist').value = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('video_preview_album').value  = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('video_preview_thumbnail').src = thumbnails[0].url;
-                document.getElementById('video_preview_img').value = thumbnails[0].url;
+                document.getElementById('video_preview_thumbnail').src = thumbnails[0];
+                document.getElementById('video_preview_img').value = thumbnails[0];
                 document.getElementById('video_preview_id').value = (data['id'] ?? '');
             } else if (data['type'] == 'playlist') {
                 thumbnails = data.thumbnails;
@@ -216,8 +216,8 @@ function init() {
                 //document.getElementById('playlist_preview_title').value   = data['title'].replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('playlist_preview_artist').value   = (data['uploader'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
                 document.getElementById('playlist_preview_album').value    = (data['title'] ?? '').replace(/[^a-zA-Z0-9\s\-\+_]+/g, '');
-                document.getElementById('playlist_preview_thumbnail').src  = thumbnails[0].url;
-                document.getElementById('playlist_preview_img').value      = thumbnails[0].url;
+                document.getElementById('playlist_preview_thumbnail').src  = thumbnails[0];
+                document.getElementById('playlist_preview_img').value      = thumbnails[0];
                 document.getElementById('playlist_preview_id').value       = data['id'] ?? '';
                 document.getElementById('playlist_preview_n_videos').value = data['videos'].length;
 
