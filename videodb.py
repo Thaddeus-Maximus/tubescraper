@@ -22,12 +22,12 @@ def load(filename):
     fn = filename
     with open(fn, 'r') as f:
         for line in f.readlines():
-            print(line)
+            #print(line)
 
             match = re.search(r"##\s*([\w\s]+)", line.strip())
             if match:
                 album = match[1]
-                print('album: ', album)
+                #print('album: ', album)
                 db[artist][album] = OrderedDict()
                 
                 continue
@@ -35,7 +35,7 @@ def load(filename):
             match = re.search(r"#\s*([\w\s]+)", line.strip())
             if match:
                 artist = match[1]
-                print('artist: ', artist)
+                #print('artist: ', artist)
                 db[artist] = OrderedDict()
                 
                 continue
