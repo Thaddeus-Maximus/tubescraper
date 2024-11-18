@@ -124,6 +124,7 @@ def download(pkg):
         album  = pkg["album"]
         title  = pkg["title"]
         track  = pkg["track"]
+        genre  = pkg["genre"]
         root   = pkg["root"]
         vid    = pkg["vid"]
         img    = pkg["img"]
@@ -187,6 +188,7 @@ def download(pkg):
             "-metadata:s:v", "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\"",
             "-metadata", "title=%s"%title,
             "-metadata", "artist=%s"%artist,
+            "-genre",    "genre=%s"%genre,
             "-metadata", "album=%s"%album,
             "-metadata", "track=%d"%track,
             newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)

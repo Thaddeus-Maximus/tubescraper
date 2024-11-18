@@ -91,6 +91,7 @@ def download_playlist():
 
     vid    = data.get('id')
     artist = data.get('artist')
+    genre  = data.get('genre')
     album  = data.get('album')
     img    = data.get('img')
     n_videos = data.get('n_videos')
@@ -109,6 +110,7 @@ def download_playlist():
 
         pkg = {
            "artist": artist,
+           "genre":  genre,
            "album":  album,
            "title":  title,
            "img":    img,
@@ -132,6 +134,7 @@ def download_video():
     title  = data.get('title')
     vid    = data.get('id')
     artist = data.get('artist')
+    genre  = data.get('genre')
     album  = data.get('album')
     img    = data.get('img')
 
@@ -139,6 +142,8 @@ def download_video():
         return 'No artist specified'
     if not album:
         return 'No album specified'
+    if not genre:
+        genre = "unspecified";
     if not vid:
         return 'No video ID specified'
     if not title:
@@ -150,6 +155,7 @@ def download_video():
     pkg = {
        "artist": artist,
        "album":  album,
+       "genre":  genre,
        "title":  title,
        "img":    img,
        "root":   os.path.join(os.path.join(library_location, artist), album),

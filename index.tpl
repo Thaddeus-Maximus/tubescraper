@@ -306,6 +306,10 @@ function creatorSelectChange() {
                 <td><label for="album">Album</label></td>
                 <td><input id="video_preview_album" name="album" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
             </tr>
+            <tr>
+                <td><label for="genre">Genre</label></td>
+                <td><input id="video_preview_genre" name="genre" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
+            </tr>
             <tr>   
                 <td></td>
                 <td><button id="submit" type="submit">Download!</button></td>
@@ -329,6 +333,10 @@ function creatorSelectChange() {
             <tr>
                 <td><label for="album">Album</label></td>
                 <td><input id="playlist_preview_album" name="album" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
+            </tr>
+            <tr>
+                <td><label for="genre">Genre</label></td>
+                <td><input id="playlist_preview_genre" name="genre" type="text" pattern="[a-zA-Z0-9\s\-\+_]+"/></td>
             </tr>
         </table>
         <table id="playlist_preview_table"></table>
