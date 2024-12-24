@@ -170,7 +170,7 @@ def download(pkg):
             print("FAILURE")
             print("FAILURE")
             print("FAILURE")
-            return False
+            return 'error'
 
         print("Finding file")
         print("Finding file")

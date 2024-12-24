@@ -48,6 +48,7 @@ def scrape():
         if runner[1].ready():
             runners.remove(runner)
             result = runner[1].get()
+            print(result)
             if result == 'error':
                 failed.append(runner[0])
             else:
