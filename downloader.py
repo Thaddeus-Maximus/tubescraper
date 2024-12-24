@@ -163,7 +163,7 @@ def download(pkg):
 
         oldfn = [filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
         newfn = '%s/%s.mp3' % (root, title)
-        print(oldfn, '->', newfn)
+        print(str(oldfn), '->', str(newfn))
 
         """newvidfn = '%s/%s.mp4' % (root, title)
 
