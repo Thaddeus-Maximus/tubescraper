@@ -163,6 +163,8 @@ def download(pkg):
 
         oldfn = [filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
         newfn = '%s/%s.mp3' % (root, title)
+        print(oldfn, '->', newfn)
+
         """newvidfn = '%s/%s.mp4' % (root, title)
 
         subprocess.run(["ffmpeg", "-y", "-i", oldfn,
