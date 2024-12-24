@@ -126,7 +126,7 @@ def download(pkg):
         album  = pkg["album"]
         title  = pkg["title"]
         track  = pkg["track"]
-        genre  = pkg["genre"]
+        genre  = pkg["genre"] if pkg["genre"] else "unspecified"
         root   = pkg["root"]
         vid    = pkg["vid"]
         img    = pkg["img"]
@@ -154,6 +154,7 @@ def download(pkg):
             try:
                 print("Attempt %d" % attempts)
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    print("Starting it")
                     error_code = ydl.download(url)
                     print("Error Code")
                     print(error_code)
