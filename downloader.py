@@ -147,11 +147,12 @@ def download(pkg):
 
         Path(root).mkdir(parents=True, exist_ok=True)
 
-
+        print("Running YDL")
 
         attempts = 0
         while attempts < 30:
             try:
+                print("Attempt %d" % attempts)
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     error_code = ydl.download(url)
                 break
@@ -160,6 +161,8 @@ def download(pkg):
         else:
             print("FAILURE: %s (%s)" % (str(vid), str(title)))
             return False
+
+        print("Finding file")
 
         oldfn = [filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
         newfn = '%s/%s.mp3' % (root, title)
@@ -174,10 +177,13 @@ def download(pkg):
             #"-metadata", "track=%d"%track,
             newvidfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)"""
 
+        print("Getting image")
 
         img_data = requests.get(img).content
         with open(os.path.join(root, '%s.jpg' % vid), 'wb') as handler:
             handler.write(img_data)
+
+        print("Running ffmpeg")
 
         subprocess.run(["ffmpeg", "-y", "-i", oldfn,
             "-i", os.path.join(root, '%s.jpg' % vid),
@@ -199,13 +205,15 @@ def download(pkg):
 
         print("CONVERTED!", str(oldfn), str(newfn))
 
+        print("Removing old files")
         Path(oldfn).unlink()
         Path(os.path.join(root, '%s.jpg' % vid)).unlink()
 
         print("Success: %s (%s)" % (str(vid), str(title)))
         return 'success'
     except Exception as e:
-        print("Error downloading %s - error:" % str(vid), repr(e))
+        print("Error downloading %s - error:" % str(vid))
+        print(repr(e))
         return 'error'
 
 if __name__ == "__main__":
