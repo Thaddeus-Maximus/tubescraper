@@ -158,7 +158,7 @@ def download(pkg):
             except:
                 attempts += 1
         else:
-            print("FAILURE: %s (%s)" % (vid, title))
+            print("FAILURE: %s (%s)" % (str(vid), str(title)))
             return False
 
         oldfn = [filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
@@ -197,15 +197,15 @@ def download(pkg):
             "-metadata", "track=%d"%track,
             newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-        print("CONVERTED!", oldfn, newfn)
+        print("CONVERTED!", str(oldfn), str(newfn))
 
         Path(oldfn).unlink()
         Path(os.path.join(root, '%s.jpg' % vid)).unlink()
 
-        print("Success: %s (%s)" % (vid, title))
+        print("Success: %s (%s)" % (str(vid), str(title)))
         return 'success'
     except Exception as e:
-        print("Error downloading %s" % vid, e)
+        print("Error downloading %s - error:" % str(vid), repr(e))
         return 'error'
 
 if __name__ == "__main__":
