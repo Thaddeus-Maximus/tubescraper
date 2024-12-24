@@ -213,7 +213,7 @@ def download(pkg):
             "-metadata:s:v", "title=\"Album cover\"", "-metadata:s:v", "comment=\"Cover (front)\"",
             "-metadata", "title=%s"%title,
             "-metadata", "artist=%s"%artist,
-            "-genre",    "genre=%s"%genre,
+            "-metadata", "genre=%s"%genre,
             "-metadata", "album=%s"%album,
             "-metadata", "track=%d"%track,
             newfn]) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
