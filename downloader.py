@@ -1,3 +1,5 @@
+from config import *
+
 import yt_dlp
 import re
 from pathlib import Path
@@ -136,7 +138,7 @@ def download(pkg):
 
         ydl_opts = {
             "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
-            "outtmpl": '%(id)s',
+            "outtmpl": library_location+'%(id)s',
             "quiet": True,
             "no_warnings": True
             #"user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
