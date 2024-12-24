@@ -216,7 +216,7 @@ def download(pkg):
             "-genre",    "genre=%s"%genre,
             "-metadata", "album=%s"%album,
             "-metadata", "track=%d"%track,
-            newfn], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            newfn]) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
         print("CONVERTED!", str(oldfn), str(newfn))
 
