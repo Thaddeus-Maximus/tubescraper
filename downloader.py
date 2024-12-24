@@ -159,6 +159,7 @@ def download(pkg):
                     print(error_code)
                 break
             except:
+                print("Another attempt...")
                 attempts += 1
         else:
             print("FAILURE")
