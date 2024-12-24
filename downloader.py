@@ -140,7 +140,8 @@ def download(pkg):
             "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
             "outtmpl": library_location+'%(id)s',
             "quiet": False,
-            "no_warnings": False
+            "no_warnings": False,
+            "nooverwrites": False
             #"user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
         }
 
@@ -156,7 +157,7 @@ def download(pkg):
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     print("Starting it")
                     error_code = ydl.download(url)
-                    print("Error Code")
+                    print("Finished, error code")
                     print(repr(error_code))
                 break
             except:
