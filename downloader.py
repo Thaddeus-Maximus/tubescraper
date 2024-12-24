@@ -165,6 +165,11 @@ def download(pkg):
                 attempts += 1
         else:
             print("FAILURE")
+            print("FAILURE")
+            print("FAILURE")
+            print("FAILURE")
+            print("FAILURE")
+            print("FAILURE")
             return False
 
         print("Finding file")
