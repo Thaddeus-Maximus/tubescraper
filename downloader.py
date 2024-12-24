@@ -157,7 +157,7 @@ def download(pkg):
                     print("Starting it")
                     error_code = ydl.download(url)
                     print("Error Code")
-                    print(error_code)
+                    print(repr(error_code))
                 break
             except:
                 print("Another attempt...")
