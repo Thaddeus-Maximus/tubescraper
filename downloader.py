@@ -139,8 +139,8 @@ def download(pkg):
         ydl_opts = {
             "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
             "outtmpl": library_location+'%(id)s',
-            "quiet": True,
-            "no_warnings": True
+            "quiet": False,
+            "no_warnings": False
             #"user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
         }
 
@@ -170,7 +170,7 @@ def download(pkg):
 
         oldfn = [filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
         newfn = '%s/%s.mp3' % (root, title)
-        print(str(oldfn), '->', str(newfn))
+        print(repr(oldfn), '->', repr(newfn))
 
         """newvidfn = '%s/%s.mp4' % (root, title)
 
