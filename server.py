@@ -53,11 +53,13 @@ def scrape():
                 failed.append(runner[0])
             else:
                 completed.append(runner[0])
-    return json.dumps({
+    result = json.dumps({
         'completed': completed,
         'failed': failed,
         'downloading': [x[0] for x in runners]
     })
+    print(result)
+    return result
 
 @route('/hello')
 def index():
