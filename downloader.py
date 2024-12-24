@@ -1,11 +1,3 @@
-import logging
-from systemd.journal import JournalHandler
-
-log = logging.getLogger('tubescraper')
-log.addHandler(JournalHandler())
-log.setLevel(logging.INFO)
-log.info("sent to journal")
-
 from config import *
 
 import yt_dlp
