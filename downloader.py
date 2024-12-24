@@ -159,7 +159,7 @@ def download(pkg):
             except:
                 attempts += 1
         else:
-            print("FAILURE: %s (%s)" % (str(vid), str(title)))
+            print("FAILURE")
             return False
 
         print("Finding file")
