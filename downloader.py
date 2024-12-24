@@ -155,6 +155,8 @@ def download(pkg):
                 print("Attempt %d" % attempts)
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     error_code = ydl.download(url)
+                    print("Error Code")
+                    print(error_code)
                 break
             except:
                 attempts += 1
