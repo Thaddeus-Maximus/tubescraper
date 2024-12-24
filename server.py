@@ -44,6 +44,7 @@ failed = []
 
 @route('/get_downloads', method='GET')
 def scrape():
+    print(repr(pool))
     for runner in runners[:]:
         if runner[1].ready():
             runners.remove(runner)
