@@ -137,13 +137,11 @@ def download(pkg):
         print(artist, title, url)
 
         ydl_opts = {
-            "format": "bestaudio", # see https://pypi.org/project/yt-dlp/#format-selection
             "outtmpl": library_location+'%(id)s',
             "quiet": False,
             "no_warnings": False,
             "nooverwrites": False,
-            "verbose": True,
-            "user_agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0"
+            "verbose": True
         }
 
 
