@@ -156,7 +156,7 @@ def download(pkg):
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     print("Starting it")
                     error_code = ydl.download(url)
-                    print("Finished, error code": repr(error_code))
+                    print("Finished, error code:", repr(error_code))
                 break
             except:
                 print("Another attempt...")
