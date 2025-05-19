@@ -14,8 +14,8 @@ bottle.TEMPLATE_PATH.insert(0, server_location)
 
 pool  = multiprocessing.Pool(8)
 
-import videodb
-videodb.load(os.path.join(library_location, 'videos.md'))
+#import videodb
+#videodb.load(os.path.join(library_location, 'videos.md'))
 
 """
 queue = multiprocessing.Queue()
@@ -110,7 +110,7 @@ def download_playlist():
     for i in range(int(n_videos)):
         title = data.get('title_%d' % i);
         vid   = data.get('id_%d' % i)
-        videodb.add(artist, album, title, vid)
+        #videodb.add(artist, album, title, vid)
 
         pkg = {
            "artist": artist,
@@ -125,7 +125,7 @@ def download_playlist():
 
         runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
 
-    videodb.commit()
+    #videodb.commit()
 
     redirect(base_url)
 
@@ -154,7 +154,7 @@ def download_video():
         return "No title specified"
 
     # print(library_location, artist, album)
-    videodb.add(artist, album, title, vid)
+    #videodb.add(artist, album, title, vid)
 
     pkg = {
        "artist": artist,
@@ -169,7 +169,7 @@ def download_video():
 
     runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
 
-    videodb.commit()
+    #videodb.commit()
 
     redirect(base_url)
 
