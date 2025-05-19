@@ -9,10 +9,8 @@ from multiprocessing import Pool
 import sys
 import os
 
-sys.path.append('/usr/bin/ffmpeg')
-
 from yt_dlp.postprocessor import FFmpegPostProcessor
-FFmpegPostProcessor._ffmpeg_location.set('./')
+FFmpegPostProcessor._ffmpeg_location.set('/usr/bin')
 
 def scrape(url):
     """if 'music' in url:
