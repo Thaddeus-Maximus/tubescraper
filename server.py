@@ -164,7 +164,7 @@ def download_video():
        "img":    img,
        "root":   os.path.join(os.path.join(library_location, artist), album),
        "vid":    vid,
-       "track":  len(videodb.db[artist][album])
+       "track":  1
     }
 
     runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
