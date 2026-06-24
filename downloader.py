@@ -136,8 +136,19 @@ def download(pkg):
 
         print(artist, title, url)
 
+        with yt_dlp.YoutubeDL({"quiet": True}) as ydl_probe:
+            info = ydl_probe.extract_info(url, download=False)
+            formats = info.get('formats', [])
+            audio_formats = [f for f in formats if f.get('vcodec') == 'none' and f.get('acodec') not in (None, 'none')]
+            if not audio_formats:
+                audio_formats = formats
+            audio_formats.sort(key=lambda f: f.get('abr') or f.get('tbr') or 0, reverse=True)
+            fmt = audio_formats[0]['format_id'] if audio_formats else 'bestaudio/best'
+            print("Selected format:", fmt)
+
         ydl_opts = {
             "outtmpl": library_location+'%(id)s',
+            "format": fmt,
             "quiet": False,
             "no_warnings": False,
             "nooverwrites": False,
