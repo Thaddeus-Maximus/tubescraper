@@ -164,7 +164,18 @@ def download(pkg):
 
         # yt-dlp needs a JS runtime (deno or node) to solve YouTube's signature
         # challenge; without one the media URLs it gets back are often 403.
-        js_runtimes = {name: {} for name in ("deno", "node") if shutil.which(name)}
+        js_runtimes = {}
+        for name in ("deno", "node"):
+            path = shutil.which(name) or next(
+                (c for c in (
+                    os.path.expanduser("~/.deno/bin/" + name),
+                    "/usr/local/bin/" + name,
+                    "/usr/bin/" + name,
+                    "/snap/bin/" + name,
+                ) if os.access(c, os.X_OK)), None)
+            if path:
+                print("Using JS runtime %s at %s" % (name, path))
+                js_runtimes[name] = {"path": path}
         if js_runtimes:
             ydl_opts["js_runtimes"] = js_runtimes
         else:
