@@ -248,9 +248,11 @@ def download(pkg):
 
         print("Running ffmpeg")
 
-        subprocess.run(["ffmpeg", "-y", "-i", oldfn,
+        # The thumbnail is often served as WebP regardless of the URL; ID3 cover
+        # art must be JPEG/PNG, so always transcode it instead of stream-copying.
+        result = subprocess.run(["ffmpeg", "-y", "-i", oldfn,
             "-i", os.path.join(root, '%s.jpg' % vid),
-            "-c:v", "copy",
+            "-c:v", "mjpeg",
             "-map", "0:a", "-map", "1:v",
             "-b:a", "128k",
 
@@ -265,6 +267,12 @@ def download(pkg):
             "-metadata", "album=%s"%album,
             "-metadata", "track=%d"%track,
             newfn]) #, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
+        if result.returncode != 0:
+            print("ffmpeg failed with exit code", result.returncode)
+            Path(newfn).unlink(missing_ok=True)
+            Path(os.path.join(root, '%s.jpg' % vid)).unlink(missing_ok=True)
+            return 'error'
 
         print("CONVERTED!", str(oldfn), str(newfn))
 
