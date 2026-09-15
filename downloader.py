@@ -8,6 +8,10 @@ import subprocess
 from multiprocessing import Pool
 import sys
 import os
+import glob
+import time
+import shutil
+import traceback
 
 from yt_dlp.postprocessor import FFmpegPostProcessor
 FFmpegPostProcessor._ffmpeg_location.set('/usr/bin')
@@ -152,26 +156,50 @@ def download(pkg):
             "quiet": False,
             "no_warnings": False,
             "nooverwrites": False,
-            "verbose": True
+            "verbose": True,
+            # A stale .part resumed against a fresh googlevideo URL gets a 403;
+            # always start clean instead of resuming.
+            "continuedl": False,
         }
+
+        # yt-dlp needs a JS runtime (deno or node) to solve YouTube's signature
+        # challenge; without one the media URLs it gets back are often 403.
+        js_runtimes = {name: {} for name in ("deno", "node") if shutil.which(name)}
+        if js_runtimes:
+            ydl_opts["js_runtimes"] = js_runtimes
+        else:
+            print("WARNING: no deno/node found on PATH; install one or downloads may 403")
 
 
         Path(root).mkdir(parents=True, exist_ok=True)
 
         print("Running YDL")
 
+        def remove_partials():
+            for f in glob.glob(os.path.join(library_location, vid + '*.part')) +                      glob.glob(os.path.join(library_location, vid + '*.ytdl')):
+                print("Removing stale partial:", f)
+                try:
+                    os.remove(f)
+                except OSError as e:
+                    print("Could not remove", f, e)
+
         attempts = 0
-        while attempts < 30:
+        while attempts < 5:
             try:
                 print("Attempt %d" % attempts)
+                remove_partials()
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     print("Starting it")
                     error_code = ydl.download(url)
                     print("Finished, error code:", repr(error_code))
                 break
-            except:
-                print("Another attempt...")
+            except Exception as e:
+                print("Download failed: %r" % e)
+                traceback.print_exc()
                 attempts += 1
+                delay = 5 * attempts
+                print("Another attempt in %ds..." % delay)
+                time.sleep(delay)
         else:
             print("FAILURE")
             print("FAILURE")
