@@ -348,6 +348,16 @@ const $ = id => document.getElementById(id);
 const api = path => new URL(BASE + path, location.origin);
 const clean = s => (s ?? '').replace(NAME_RE, '').trim();
 
+// Playlist tracks are often titled "Song - Playlist Name" (or the reverse);
+// drop the playlist name plus its separator from either end of the title.
+function stripPlaylistName(title, name) {
+    if (!name) return title;
+    const pat = name.replace(/[.*+?^$()|[\]\\-]/g, '\\$&').replace(/\s+/g, '\\s+');
+    const re = new RegExp(`^\\s*${pat}[\\s\\-_+]*|[\\s\\-_+]*${pat}\\s*$`, 'gi');
+    const out = title.replace(re, '').replace(/\s{2,}/g, ' ').trim();
+    return out || title;
+}
+
 let thumbnails = [];
 let thumbIndex = 0;
 let previewType = null;
@@ -443,7 +453,7 @@ function showPreview(data) {
                 el('td', { class: 'num' }, String(i + 1)),
                 el('td', {},
                     el('input', { type: 'hidden', name: `id_${i}`, value: v.id }),
-                    el('input', { type: 'text', name: `title_${i}`, value: clean(v.title), pattern: '[a-zA-Z0-9\\s\\-\\+_]+' })),
+                    el('input', { type: 'text', name: `title_${i}`, value: stripPlaylistName(clean(v.title), clean(data.title)), pattern: '[a-zA-Z0-9\\s\\-\\+_]+' })),
                 el('td', { class: 'mono' }, v.id));
             cb.addEventListener('change', () => row.classList.toggle('excluded', !cb.checked));
             body.append(row);
