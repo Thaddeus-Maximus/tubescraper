@@ -6,6 +6,7 @@ sys.path.insert(0, server_location)
 import json
 import os
 import hmac
+import itertools
 import multiprocessing
 import downloader
 import re
@@ -28,166 +29,138 @@ def check_auth(user, password):
 
 bottle.install(bottle.auth_basic(check_auth, realm="tubescraper"))
 
-pool  = multiprocessing.Pool(8)
+pool     = multiprocessing.Pool(8)
+manager  = multiprocessing.Manager()
+progress = manager.dict()   # job id -> live state, written by downloader workers
+jobs     = []               # [{'id', 'pkg', 'result'}] in submission order
+job_ids  = itertools.count(1)
 
-#import videodb
-#videodb.load(os.path.join(library_location, 'videos.md'))
+def enqueue(pkg):
+    job_id = next(job_ids)
+    progress[job_id] = {'status': 'queued'}
+    jobs.append({
+        'id': job_id,
+        'pkg': pkg,
+        'result': pool.apply_async(downloader.download, (pkg, progress, job_id)),
+    })
 
-"""
-queue = multiprocessing.Queue()
+def json_response(obj, status=200):
+    response.status = status
+    response.content_type = 'application/json'
+    return json.dumps(obj)
 
-active_downloads = {}
-
-def update_downloader_state():
-    try:
-        while True:
-            update = queue.get(False)
-            print("got update: ", update)
-            active_downloads[update[0]]['status'] = update[1]
-    except:
-        pass
-
-
-def downloader_callback(result):
-    global active_downloads
-    print("thread finished", result)
-    active_downloads[result['id']] = result
-"""
-
-runners = []
-completed = []
-failed = []
+def script_json(obj):
+    # Safe to drop inside a <script> block.
+    return json.dumps(obj).replace('</', '<\\/')
 
 @route('/get_downloads', method='GET')
-def scrape():
-    print(repr(pool))
-    for runner in runners[:]:
-        if runner[1].ready():
-            runners.remove(runner)
-            result = runner[1].get()
-            print(result)
-            if result == 'error':
-                failed.append(runner[0])
-            else:
-                completed.append(runner[0])
-    result = json.dumps({
-        'completed': completed,
-        'failed': failed,
-        'downloading': [x[0] for x in runners]
-    })
-    print(result)
-    return result
+def get_downloads():
+    snapshot = progress.copy()
+    out = []
+    for job in jobs:
+        state = dict(snapshot.get(job['id'], {}))
+        if job['result'].ready():
+            ok = job['result'].get() == 'success'
+            state['status'] = 'done' if ok else 'failed'
+            if ok:
+                state['percent'] = 100
+        pkg = job['pkg']
+        out.append(dict(state, id=job['id'], title=pkg['title'], artist=pkg['artist'],
+                        album=pkg['album'], vid=pkg['vid']))
+    return json_response({'jobs': out})
 
-@route('/hello')
-def index():
-    return "Hello there, kenobi"
+@post('/clear_finished')
+def clear_finished():
+    for job in jobs[:]:
+        if job['result'].ready():
+            jobs.remove(job)
+            progress.pop(job['id'], None)
+    return json_response({'ok': True})
 
 @route('/', method='GET')
 def index_GET():
-    #creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
-    #creators = ["Jonathan Pageau", "Jordan Peterson", "Alex Jones"]
-    #return template('index.tpl', creators=json.dumps(creators), msg="...")
-
-    #update_downloader_state()
-
-    creators = [filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename))]
-
-    if 'url' in request.query:
-        url = request.query['url']
-        return template('index.tpl', base_url=base_url, creators=creators, url=url)
-    return template('index.tpl',     base_url=base_url, creators=creators, url='')
+    creators = sorted(filename for filename in os.listdir(library_location) if os.path.isdir(os.path.join(library_location,filename)))
+    url = request.query.get('url', '')
+    return template('index.tpl', base_url=base_url,
+                    creators_json=script_json(creators), url_json=script_json(url))
 
 @post('/scrape')
 def scrape():
-    if 'url' in request.forms:
-        url = request.forms['url']
-        scraped = downloader.scrape(url)
-        return json.dumps(scraped)
-    return json.dumps({'error': 'no url provided'})
+    url = request.forms.getunicode('url')
+    if not url:
+        return json_response({'error': 'no url provided'}, 400)
+    try:
+        return json_response(downloader.scrape(url))
+    except Exception as e:
+        return json_response({'error': str(e)}, 500)
+
+def make_pkg(data, title, vid, track):
+    artist = data.getunicode('artist')
+    album  = data.getunicode('album')
+    return {
+       "artist": artist,
+       "genre":  data.getunicode('genre') or "unspecified",
+       "album":  album,
+       "title":  title,
+       "img":    data.getunicode('img'),
+       "root":   os.path.join(os.path.join(library_location, artist), album),
+       "vid":    vid,
+       "track":  track
+    }
+
+def bad_name(name):
+    # artist/album/title each become a single path component under the library
+    return (not name or name.strip() in ('.', '..')
+            or any(c in name for c in ('/', '\\', '\0')))
+
+def inside_library(path):
+    lib = os.path.realpath(library_location)
+    return os.path.commonpath([lib, os.path.realpath(path)]) == lib
+
+def check_common(data):
+    if not data.getunicode('artist'):
+        return 'No artist specified'
+    if not data.getunicode('album'):
+        return 'No album specified'
+    if not data.getunicode('id'):
+        return 'No video ID specified'
+    if bad_name(data.getunicode('artist')) or bad_name(data.getunicode('album')):
+        return 'Artist/album may not contain path separators'
+    if not inside_library(os.path.join(library_location, data.getunicode('artist'), data.getunicode('album'))):
+        return 'Artist/album resolve outside the library'
 
 @post('/download_playlist')
 def download_playlist():
     data = request.forms
+    err = check_common(data)
+    if err:
+        return json_response({'error': err}, 400)
 
-    vid    = data.get('id')
-    artist = data.get('artist')
-    genre  = data.get('genre')
-    album  = data.get('album')
-    img    = data.get('img')
-    n_videos = data.get('n_videos')
-
-    if not artist:
-        return 'No artist specified'
-    if not album:
-        return 'No album specified'
-    if not vid:
-        return 'No video ID specified'
-
-    for i in range(int(n_videos)):
-        title = data.get('title_%d' % i);
-        vid   = data.get('id_%d' % i)
-        #videodb.add(artist, album, title, vid)
-
-        pkg = {
-           "artist": artist,
-           "genre":  genre,
-           "album":  album,
-           "title":  title,
-           "img":    img,
-           "root":   os.path.join(os.path.join(library_location, artist), album),
-           "vid":    vid,
-           "track":  i+1
-        }
-
-        runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
-
-    #videodb.commit()
-
-    redirect(base_url)
+    pkgs = []
+    for i in range(int(data.get('n_videos') or 0)):
+        if not data.get('include_%d' % i):
+            continue
+        title = data.getunicode('title_%d' % i)
+        if bad_name(title):
+            return json_response({'error': 'Bad title for track %d' % (i+1)}, 400)
+        pkgs.append(make_pkg(data, title, data.get('id_%d' % i), i+1))
+    for pkg in pkgs:
+        enqueue(pkg)
+    return json_response({'queued': len(pkgs)})
 
 @post('/download_video')
 def download_video():
     data = request.forms
+    err = check_common(data)
+    if not err and not data.getunicode('title'):
+        err = "No title specified"
+    if not err and bad_name(data.getunicode('title')):
+        err = "Title may not contain path separators"
+    if err:
+        return json_response({'error': err}, 400)
 
-    # print({i:data.get(i) for i in data.keys()})
-
-    title  = data.get('title')
-    vid    = data.get('id')
-    artist = data.get('artist')
-    genre  = data.get('genre')
-    album  = data.get('album')
-    img    = data.get('img')
-
-    if not artist:
-        return 'No artist specified'
-    if not album:
-        return 'No album specified'
-    if not genre:
-        genre = "unspecified";
-    if not vid:
-        return 'No video ID specified'
-    if not title:
-        return "No title specified"
-
-    # print(library_location, artist, album)
-    #videodb.add(artist, album, title, vid)
-
-    pkg = {
-       "artist": artist,
-       "album":  album,
-       "genre":  genre,
-       "title":  title,
-       "img":    img,
-       "root":   os.path.join(os.path.join(library_location, artist), album),
-       "vid":    vid,
-       "track":  1
-    }
-
-    runners.append((pkg, pool.apply_async(downloader.download, (pkg,))))
-
-    #videodb.commit()
-
-    redirect(base_url)
+    enqueue(make_pkg(data, data.getunicode('title'), data.get('id'), 1))
+    return json_response({'queued': 1})
 
 
 #application = bottle.default_app()

@@ -122,10 +122,21 @@ def scrape(url):
             }
 
 
-def download(pkg):
+def download(pkg, progress=None, job_id=None):
     print("downloader here!")
     print("downloading", pkg)
+
+    # Live state for the web UI; `progress` is a Manager dict shared with server.py.
+    def report(**state):
+        if progress is not None:
+            try:
+                progress[job_id] = state
+            except Exception as e:
+                print("Could not report progress:", repr(e))
+
+    vid = pkg.get("vid")
     try:
+        report(status='probing')
         artist = pkg["artist"]
         album  = pkg["album"]
         title  = pkg["title"]
@@ -160,7 +171,23 @@ def download(pkg):
             # A stale .part resumed against a fresh googlevideo URL gets a 403;
             # always start clean instead of resuming.
             "continuedl": False,
+            "progress_hooks": [],
         }
+
+        last_report = [0.0]
+        def on_progress(d):
+            if d.get('status') != 'downloading':
+                return
+            now = time.monotonic()
+            if now - last_report[0] < 0.5:
+                return
+            last_report[0] = now
+            total = d.get('total_bytes') or d.get('total_bytes_estimate')
+            done  = d.get('downloaded_bytes') or 0
+            report(status='downloading',
+                   percent=100.0 * done / total if total else None,
+                   speed=d.get('speed'), eta=d.get('eta'), attempt=attempts + 1)
+        ydl_opts["progress_hooks"].append(on_progress)
 
         # yt-dlp needs a JS runtime (deno or node) to solve YouTube's signature
         # challenge; without one the media URLs it gets back are often 403.
@@ -208,6 +235,7 @@ def download(pkg):
                 print("Download failed: %r" % e)
                 traceback.print_exc()
                 attempts += 1
+                report(status='retrying', attempt=attempts + 1, error=str(e))
                 delay = 5 * attempts
                 print("Another attempt in %ds..." % delay)
                 time.sleep(delay)
@@ -218,14 +246,11 @@ def download(pkg):
             print("FAILURE")
             print("FAILURE")
             print("FAILURE")
+            report(status='failed', error='Download failed after %d attempts' % attempts)
             return 'error'
 
         print("Finding file")
-        print("Finding file")
-        print("Finding file")
-        print("Finding file")
-        print("Finding file")
-        print("Finding file")
+        report(status='converting', percent=100)
 
         oldfn = library_location+[filename for filename in os.listdir(library_location) if filename.startswith(vid)][0]
         newfn = '%s/%s.mp3' % (root, title)
@@ -270,6 +295,7 @@ def download(pkg):
 
         if result.returncode != 0:
             print("ffmpeg failed with exit code", result.returncode)
+            report(status='failed', error='ffmpeg exited with code %d' % result.returncode)
             Path(newfn).unlink(missing_ok=True)
             Path(os.path.join(root, '%s.jpg' % vid)).unlink(missing_ok=True)
             return 'error'
@@ -285,6 +311,7 @@ def download(pkg):
     except Exception as e:
         print("Error downloading %s - error:" % str(vid))
         print(repr(e))
+        report(status='failed', error=str(e))
         return 'error'
 
 if __name__ == "__main__":
