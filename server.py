@@ -1,9 +1,11 @@
 from config import *
+import config
 
 import sys
 sys.path.insert(0, server_location)
 import json
 import os
+import hmac
 import multiprocessing
 import downloader
 import re
@@ -11,6 +13,20 @@ import bottle
 bottle.debug(True)
 from bottle import route, request, post, run, template, response, redirect
 bottle.TEMPLATE_PATH.insert(0, server_location)
+
+# Single-user HTTP Basic auth on every route. Credentials live in config.py
+# (auth_user / auth_password); refuse to start without them rather than run open.
+if not getattr(config, 'auth_user', None) or not getattr(config, 'auth_password', None):
+    sys.exit("config.py must define auth_user and auth_password")
+
+def check_auth(user, password):
+    if user is None or password is None:
+        return False
+    user_ok = hmac.compare_digest(user.encode(), config.auth_user.encode())
+    pass_ok = hmac.compare_digest(password.encode(), config.auth_password.encode())
+    return user_ok and pass_ok
+
+bottle.install(bottle.auth_basic(check_auth, realm="tubescraper"))
 
 pool  = multiprocessing.Pool(8)
 
