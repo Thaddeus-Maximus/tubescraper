@@ -473,6 +473,7 @@ let thumbLoad = 0;
 async function loadThumbnails(urls) {
     const load = ++thumbLoad;
     $('thumb_caption').textContent = `Checking ${urls.length} images…`;
+    $('download_btn').disabled = true;  // cover art URL isn't chosen yet
     const measured = await Promise.all(urls.map(src => new Promise(resolve => {
         const img = new Image();
         img.onload  = () => resolve({ src, w: img.naturalWidth, h: img.naturalHeight });
@@ -484,6 +485,7 @@ async function loadThumbnails(urls) {
         .sort((a, b) => b.w * b.h - a.w * a.h);
     thumbIndex = 0;
     setThumb();
+    $('download_btn').disabled = false;
 }
 
 function setThumb() {

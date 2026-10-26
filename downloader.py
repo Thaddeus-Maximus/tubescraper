@@ -16,6 +16,16 @@ import traceback
 from yt_dlp.postprocessor import FFmpegPostProcessor
 FFmpegPostProcessor._ffmpeg_location.set('/usr/bin')
 
+def all_thumbnails(*infos):
+    # Every thumbnail URL yt-dlp knows about, deduped. Listed sizes are often
+    # missing or wrong (and maxres may not exist), so the page measures them.
+    urls = []
+    for info in infos:
+        for t in [{'url': info.get('thumbnail')}] + (info.get('thumbnails') or []):
+            if t.get('url') and t['url'] not in urls:
+                urls.append(t['url'])
+    return urls
+
 def scrape(url):
     """if 'music' in url:
         print("Booting firefox to scrape...")
@@ -96,20 +106,18 @@ def scrape(url):
         info_dict = ydl.extract_info(url, download=False)
         if 'entries' in info_dict.keys():
             # it's a playlist
+            entries = [e for e in info_dict.get('entries') if e]
             return {
                 'type': 'playlist',
                 'id': info_dict.get('id'),
                 'title': info_dict.get('title'),
                 'uploader': info_dict.get('uploader'),
-                #'thumbnail': info_dict.get('thumbnails')[-1].get('url'),
-                'thumbnails': [x.get('url') for x in info_dict.get('thumbnails')],
+                'thumbnails': all_thumbnails(info_dict, *entries),
                 'videos': [{
                     'id': video.get('id'),
                     'title': video.get('title'),
                     'uploader': video.get('uploader'),
-                    #'thumbnail': video.get('thumbnail'),
-                    'thumbnails': [video.get('thumbnail')] + [x.get('url') for x in info_dict.get('thumbnails')]
-                } for video in info_dict.get('entries')]
+                } for video in entries]
             }
         else:
             return {
@@ -117,8 +125,7 @@ def scrape(url):
                 'id': info_dict.get('id'),
                 'title': info_dict.get('title'),
                 'uploader': info_dict.get('uploader'),
-                'thumbnail': info_dict.get('thumbnail'),
-                'thumbnails': [info_dict.get('thumbnail')] + [x.get('url') for x in info_dict.get('thumbnails')]
+                'thumbnails': all_thumbnails(info_dict),
             }
 
 
