@@ -35,14 +35,17 @@ progress = manager.dict()   # job id -> live state, written by downloader worker
 jobs     = []               # [{'id', 'pkg', 'result'}] in submission order
 job_ids  = itertools.count(1)
 
+def submit(job):
+    progress[job['id']] = {'status': 'queued'}
+    job['result'] = pool.apply_async(downloader.download, (job['pkg'], progress, job['id']))
+
 def enqueue(pkg):
-    job_id = next(job_ids)
-    progress[job_id] = {'status': 'queued'}
-    jobs.append({
-        'id': job_id,
-        'pkg': pkg,
-        'result': pool.apply_async(downloader.download, (pkg, progress, job_id)),
-    })
+    job = {'id': next(job_ids), 'pkg': pkg}
+    submit(job)
+    jobs.append(job)
+
+def is_failed(job):
+    return job['result'].ready() and job['result'].get() != 'success'
 
 def json_response(obj, status=200):
     response.status = status
@@ -76,6 +79,24 @@ def clear_finished():
             jobs.remove(job)
             progress.pop(job['id'], None)
     return json_response({'ok': True})
+
+# Retries resubmit the same pkg under the same job id, so the row stays put.
+@post('/retry/<job_id:int>')
+def retry(job_id):
+    job = next((j for j in jobs if j['id'] == job_id), None)
+    if job is None:
+        return json_response({'error': 'no such job'}, 404)
+    if not is_failed(job):
+        return json_response({'error': 'job has not failed'}, 400)
+    submit(job)
+    return json_response({'queued': 1})
+
+@post('/retry_failed')
+def retry_failed():
+    failed = [j for j in jobs if is_failed(j)]
+    for job in failed:
+        submit(job)
+    return json_response({'queued': len(failed)})
 
 @route('/', method='GET')
 def index_GET():

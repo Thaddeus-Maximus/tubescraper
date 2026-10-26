@@ -110,6 +110,7 @@ button.ghost {
 }
 button.ghost:hover { color: var(--text); }
 button:disabled { opacity: 0.5; cursor: default; }
+button.small { padding: 2px 10px; font-size: 0.8rem; }
 
 .notice { color: var(--muted); margin: 0 0 24px; }
 .notice.error { color: var(--err); }
@@ -313,6 +314,7 @@ table.data tr.excluded td:not(:first-child) { opacity: 0.4; }
         <h2>Downloads</h2>
         <div class="counts" id="counts"></div>
         <div class="spacer"></div>
+        <button class="ghost" id="retry_all_btn" type="button">Retry failed</button>
         <button class="ghost" id="clear_btn" type="button">Clear finished</button>
     </div>
     <div class="table-wrap">
@@ -325,6 +327,7 @@ table.data tr.excluded td:not(:first-child) { opacity: 0.4; }
                     <th style="width: 22%">Progress</th>
                     <th class="num">Speed</th>
                     <th class="num">ETA</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody id="jobs_body"></tbody>
@@ -425,9 +428,10 @@ function showPreview(data) {
     previewType = data.type;
     const isList = data.type === 'playlist';
 
-    thumbnails = (data.thumbnails || []).filter(Boolean);
+    thumbnails = [];
     thumbIndex = 0;
     setThumb();
+    loadThumbnails(data.thumbnails || []);
 
     $('preview_heading').textContent = isList
         ? `Playlist · ${data.videos.length} tracks`
@@ -462,13 +466,33 @@ function showPreview(data) {
     $('preview').hidden = false;
 }
 
+// Load every candidate image, drop ones that fail, and order largest first so
+// the highest-resolution one is selected by default. Listed sizes aren't
+// trusted: YouTube serves a 120x90 placeholder for missing maxres images.
+let thumbLoad = 0;
+async function loadThumbnails(urls) {
+    const load = ++thumbLoad;
+    $('thumb_caption').textContent = `Checking ${urls.length} images…`;
+    const measured = await Promise.all(urls.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.onload  = () => resolve({ src, w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = () => resolve(null);
+        img.src = src;
+    })));
+    if (load !== thumbLoad) return;  // a newer fetch superseded this one
+    thumbnails = measured.filter(t => t && t.w > 0)
+        .sort((a, b) => b.w * b.h - a.w * a.h);
+    thumbIndex = 0;
+    setThumb();
+}
+
 function setThumb() {
-    const src = thumbnails[thumbIndex] || '';
-    $('thumb').src = src;
-    $('f_img').value = src;
-    $('thumb_caption').textContent = thumbnails.length > 1
-        ? `Thumbnail ${thumbIndex + 1} of ${thumbnails.length} · click to cycle`
-        : '';
+    const t = thumbnails[thumbIndex];
+    $('thumb').src = t ? t.src : '';
+    $('f_img').value = t ? t.src : '';
+    $('thumb_caption').textContent = !t ? 'No images found'
+        : `${t.w}×${t.h}` + (thumbnails.length > 1
+            ? ` · ${thumbIndex + 1} of ${thumbnails.length} · click to cycle` : '');
 }
 
 function closePreview() {
@@ -497,7 +521,7 @@ function renderJobs(jobs) {
     const body = $('jobs_body');
     body.replaceChildren();
     if (!jobs.length) {
-        body.append(el('tr', {}, el('td', { class: 'empty', colSpan: 6 }, 'No downloads yet')));
+        body.append(el('tr', {}, el('td', { class: 'empty', colSpan: 7 }, 'No downloads yet')));
     }
     // Newest first
     for (const j of [...jobs].reverse()) {
@@ -513,7 +537,10 @@ function renderJobs(jobs) {
             el('td', {}, pill),
             el('td', {}, bar),
             el('td', { class: 'num' }, j.status === 'downloading' ? fmtSpeed(j.speed) : ''),
-            el('td', { class: 'num' }, j.status === 'downloading' ? fmtEta(j.eta) : '')));
+            el('td', { class: 'num' }, j.status === 'downloading' ? fmtEta(j.eta) : ''),
+            el('td', { class: 'num' }, j.status === 'failed'
+                ? el('button', { class: 'ghost small', type: 'button', onclick: () => retry(`retry/${j.id}`) }, 'Retry')
+                : '')));
     }
 
     const counts = $('counts');
@@ -525,7 +552,18 @@ function renderJobs(jobs) {
     if (done)   counts.append(el('span', { class: 'pill done' }, `${done} done`));
     if (failed) counts.append(el('span', { class: 'pill failed' }, `${failed} failed`));
     $('clear_btn').disabled = !(done + failed);
+    $('retry_all_btn').disabled = !failed;
     return active;
+}
+
+async function retry(path) {
+    try {
+        const res = await postForm(path, new FormData());
+        toast(`Retrying ${res.queued} download${res.queued === 1 ? '' : 's'}`);
+    } catch (err) {
+        toast('Error: ' + err.message);
+    }
+    poll();
 }
 
 async function poll() {
@@ -587,6 +625,8 @@ function init() {
         await postForm('clear_finished', new FormData());
         poll();
     });
+
+    $('retry_all_btn').addEventListener('click', () => retry('retry_failed'));
 
     if (INIT_URL) fetchInfo(INIT_URL);
     poll();
